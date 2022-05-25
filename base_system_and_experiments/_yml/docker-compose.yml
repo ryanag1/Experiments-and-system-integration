@@ -1,0 +1,109 @@
+version: '3'
+services:
+  rev-proxy:
+    container_name: test_rev-proxy
+    build: 
+      context: ../rev-proxy
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'
+      - "443:443"
+    volumes:
+      - ../letsencrypt:/etc/letsencrypt
+      - ../frontend/dist:/var/www/html
+    tty: true
+    networks:
+      default:
+        ipv4_address: 172.0.0.2
+
+  frontend-dev:
+    container_name: test_frontend-dev
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=frontend-dev
+    ports:
+      - "3478:3478"
+      - "3478:3478/udp"
+      - "19302:19302"
+      - "19302:19302/udp"
+      - "50000:50000/udp"
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules/
+      - /app/dist/
+    stdin_open: true
+    tty: true
+    networks:
+      default:
+        ipv4_address: 172.0.2.1
+  
+  frontend:
+    container_name: test_frontend
+    build: 
+      context: ../frontend
+      args:
+        - SERVICE_NAME=frontend
+        - HOME=/app
+    volumes:
+      - ../frontend/dist:/app/dist
+    stdin_open: true
+    tty: true
+    depends_on:
+      - rev-proxy
+    networks:
+      default:
+        ipv4_address: 172.0.1.1
+    
+  backend:
+    container_name: test_backend
+    build:
+      context: ../backend
+      args:
+        - SERVICE_NAME=backend
+    stdin_open: true
+    tty: true
+    depends_on:
+      - rev-proxy
+    networks:
+      default:
+        ipv4_address: 172.0.1.2
+
+  backend-dev:
+    container_name: test_backend-dev
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        - SERVICE_NAME=backend-dev
+    volumes:
+      - ../backend:/usr/src/app
+      - /usr/src/app/.pid
+      - ../backend/ducts:/usr/local/lib/python3.9/site-packages/ducts
+    stdin_open: true
+    tty: true
+    networks:
+      default:
+        ipv4_address: 172.0.2.2
+
+  redis:
+    restart: always
+    image: redis:6-alpine
+    container_name: test_redis
+    volumes:
+     - ../redis/data:/data
+    ports:
+      - '6379:6379'
+    depends_on: 
+      - rev-proxy
+    networks:
+      default:
+        ipv4_address: 172.0.1.10
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.0.0.0/16

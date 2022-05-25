@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+
+  redis-dev:
+    restart: always
+    image: redis:6-alpine
+    container_name: test_redis-dev
+    volumes:
+     - ../redis/data-dev:/data
+    ports:
+      - '6380:6379'
+    depends_on: 
+      - rev-proxy
+    networks:
+      default:
+        ipv4_address: 172.0.1.10
