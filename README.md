@@ -1,5 +1,5 @@
 # Experiments-and-system-integration
-Private experiments conducted on basic system consisting of nginx (reverse-proxy), vue (frontend), ducts python server (backend), redis (database)
+Private experiments conducted on basic system consisting of nginx (reverse-proxy), vue (frontend), ducts python server (backend), redis (database)  
 Ducts:https://pypi.org/project/ducts/ websocket-sharp:https://github.com/sta/websocket-sharp
 ![スライド4](https://user-images.githubusercontent.com/106264576/170354559-7baf7770-89ce-419a-8a22-9348e015fa0e.PNG)
 ![スライド2](https://user-images.githubusercontent.com/106264576/170354796-e0d42719-33a7-4e22-93b1-f0a5396411a4.PNG)
